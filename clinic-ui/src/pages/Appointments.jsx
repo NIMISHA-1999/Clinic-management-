@@ -40,7 +40,7 @@ const styles = {
     width: "100%",
     minHeight: "100vh",
     padding: "30px 20px",
-    background: "linear-gradient(135deg, #f9fafb, #e0f2fe)", // light gradient
+    background: "#f9fafb", // light gradient
     boxSizing: "border-box",
   },
   heading: {
