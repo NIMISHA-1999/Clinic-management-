@@ -18,92 +18,109 @@ export default function Login() {
       await login(email, password); // calls backend /users/login
       nav("/");
     } catch (err) {
-      setError(err.response?.data || "Invalid credentials");
+      const apiError = err.response?.data;
+      if (apiError && typeof apiError === "object") {
+        const messages = Object.values(apiError).flat().join(" ");
+        setError(messages);
+      } else {
+        setError("Invalid credentials");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={styles.container}>
-      <form onSubmit={submit} style={styles.form}>
-        <h2 style={styles.title}>Clinic Login</h2>
+    <>
+      <style>{`
+        html, body, #root {
+          margin: 0;
+          padding: 0;
+          width: 100%;
+          height: 100%;
+        }
+      `}</style>
 
-        <label style={styles.label}>Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={styles.input}
-          placeholder="Enter email"
-          required
-        />
+      <div style={styles.container}>
+        <form onSubmit={submit} style={styles.form}>
+          <h2 style={styles.title}>Clinic Login</h2>
 
-        <label style={styles.label}>Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={styles.input}
-          placeholder="Enter password"
-          required
-        />
+          <label style={styles.label}>Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={styles.input}
+            placeholder="Enter email"
+            required
+          />
 
-        <button type="submit" style={styles.button} disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
-        </button>
+          <label style={styles.label}>Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={styles.input}
+            placeholder="Enter password"
+            required
+          />
 
-        {error && (
-          <div style={styles.error}>
-            {typeof error === "string" ? error : JSON.stringify(error)}
-          </div>
-        )}
-      </form>
-    </div>
+          <button type="submit" style={styles.button} disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
+
+          {error && <div style={styles.error}>{error}</div>}
+        </form>
+      </div>
+    </>
   );
 }
 
 const styles = {
   container: {
-    display: "flex",
+    width: "100%",
     height: "100vh",
-    justifyContent: "center",
-    alignItems: "center",
     background: "linear-gradient(135deg, #dbeafe, #93c5fd)",
+    padding: "0", // no padding so form fills
   },
   form: {
     background: "white",
-    padding: "32px",
-    borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-    width: "100%",
-    maxWidth: "380px",
+    padding: "40px",
+    width: "100%",    // ✅ full width
+    height: "100%",   // ✅ full height
     display: "flex",
     flexDirection: "column",
-    gap: "12px",
+    justifyContent: "center",
+    gap: "16px",
   },
-  title: { textAlign: "center", marginBottom: "16px", color: "#1d4ed8" },
-  label: { fontSize: "14px", fontWeight: "500", color: "#374151" },
+  title: {
+    marginBottom: "20px",
+    color: "#1d4ed8",
+    fontSize: "2rem",
+  },
+  label: { fontSize: "16px", fontWeight: "600", color: "#374151" },
   input: {
-    padding: "10px",
-    borderRadius: "8px",
+    padding: "14px",
+    borderRadius: "6px",
     border: "1px solid #cbd5e1",
     outline: "none",
-    fontSize: "14px",
+    fontSize: "16px",
+    width: "100%",
   },
   button: {
-    marginTop: "12px",
-    padding: "10px",
+    padding: "14px",
     background: "#1d4ed8",
     color: "white",
     fontWeight: "600",
     border: "none",
-    borderRadius: "8px",
+    borderRadius: "6px",
     cursor: "pointer",
+    width: "100%",
+    fontSize: "16px",
   },
   error: {
     marginTop: "12px",
-    padding: "8px",
+    padding: "10px",
     background: "#fee2e2",
     color: "#b91c1c",
     borderRadius: "6px",

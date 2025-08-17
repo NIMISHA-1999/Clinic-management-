@@ -21,9 +21,17 @@ export default function Signup() {
       await api.post("/users/signup/", form);
       setSuccess(true);
       setTimeout(() => nav("/login"), 1500);
-    } catch (err) {
-      setError(err.response?.data || "Signup failed");
-    } finally {
+    }  catch (err) {
+  const apiError = err.response?.data;
+  if (apiError?.email) {
+    setError(apiError.email[0]);  // pick first email error
+  } else if (typeof apiError === "string") {
+    setError(apiError);
+  } else {
+    setError("Signup failed");
+  }
+}
+finally {
       setLoading(false);
     }
   };
@@ -31,83 +39,108 @@ export default function Signup() {
   return (
     <>
       <style>{`
-        .signup-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          background: #f9fbfd;
-        }
-        .signup-form {
-          background: white;
-          padding: 32px;
-          border-radius: 12px;
-          box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-          width: 100%;
-          max-width: 380px;
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-        .signup-form h2 {
-          text-align: center;
-          margin-bottom: 12px;
-          color: #222;
-        }
-        .signup-form label {
-          font-size: 0.9rem;
-          font-weight: 500;
-          margin-bottom: 4px;
-          color: #333;
-        }
-        .signup-form input {
-          padding: 10px 12px;
-          border: 1px solid #d0d7de;
-          border-radius: 8px;
-          font-size: 0.95rem;
-          outline: none;
-          transition: border 0.2s;
-        }
-        .signup-form input:focus {
-          border-color: #1976d2;
-        }
-        .signup-form button {
-          background: #1976d2;
-          color: white;
-          padding: 12px;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          font-size: 1rem;
-          transition: background 0.2s;
-        }
-        .signup-form button:hover {
-          background: #125ea8;
-        }
-        .error {
-          color: crimson;
-          font-size: 0.85rem;
-          text-align: center;
-        }
-        .success {
-          color: green;
-          font-size: 0.85rem;
-          text-align: center;
-        }
-        .note {
-          text-align: center;
-          font-size: 0.85rem;
-          color: #555;
-        }
-        .note a {
-          color: #1976d2;
-          text-decoration: none;
-          font-weight: 500;
-        }
-        .note a:hover {
-          text-decoration: underline;
-        }
-      `}</style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body, html, #root {
+    width: 100%;
+    height: 100%;
+  }
+
+  .signup-container {
+    width: 100%;
+    height: 100vh;
+    background: #f9fbfd;
+  }
+
+  .signup-form {
+    background: white;
+    padding: 40px;
+    border-radius: 0;
+    box-shadow: none;
+    width: 100%;
+    height: 100%;   /* ✅ take full height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* ✅ vertically center inputs */
+    gap: 20px;
+  }
+
+  .signup-form h2 {
+    text-align: left;
+    margin-bottom: 20px;
+    color: #222;
+    font-size: 2rem;
+  }
+
+  .signup-form label {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333;
+  }
+
+  .signup-form input {
+    padding: 14px 16px;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+    width: 100%;
+  }
+
+  .signup-form input:focus {
+    border-color: #1976d2;
+  }
+
+  .signup-form button {
+    background: #1976d2;
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    width: 100%;
+  }
+
+  .signup-form button:hover {
+    background: #125ea8;
+  }
+
+  .error {
+    color: crimson;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .success {
+    color: green;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .note {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  .note a {
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .note a:hover {
+    text-decoration: underline;
+  }
+`}</style>
+
+
 
       <div className="signup-container">
         <form className="signup-form" onSubmit={submit}>
