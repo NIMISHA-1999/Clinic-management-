@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Login() {
   const { login } = useAuth();
@@ -15,7 +15,7 @@ export default function Login() {
     setLoading(true);
     setError(null);
     try {
-      await login(email, password); // calls backend /users/login
+      await login(email, password);
       nav("/");
     } catch (err) {
       const apiError = err.response?.data;
@@ -31,95 +31,137 @@ export default function Login() {
   };
 
   return (
-    <>
-      <style>{`
-        html, body, #root {
-          margin: 0;
-          padding: 0;
-          width: 100%;
-          height: 100%;
-        }
-      `}</style>
-
-      <div style={styles.container}>
-        <form onSubmit={submit} style={styles.form}>
-          <h2 style={styles.title}>Clinic Login</h2>
-
-          <label style={styles.label}>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={styles.input}
-            placeholder="Enter email"
-            required
-          />
-
-          <label style={styles.label}>Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={styles.input}
-            placeholder="Enter password"
-            required
-          />
-
-          <button type="submit" style={styles.button} disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
-          </button>
-
-          {error && <div style={styles.error}>{error}</div>}
-        </form>
+    <div style={styles.container}>
+      {/* Left Section with Full Image */}
+      <div style={styles.left}>
+        <img
+          src="https://img.freepik.com/free-vector/doctor-character-background_1270-84.jpg" // ✅ replace with clinic banner
+          alt="Clinic Banner"
+          style={styles.image}
+        />
       </div>
-    </>
+
+      {/* Right Section with Modern Card Form */}
+      <div style={styles.right}>
+        <div style={styles.card}>
+          <h2 style={styles.title}>🏥 Welcome Back</h2>
+          <p style={styles.subtitle}>Login to manage your appointments</p>
+
+          <form onSubmit={submit} style={styles.form}>
+            <label style={styles.label}>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={styles.input}
+              placeholder="Enter your email"
+              required
+            />
+
+            <label style={styles.label}>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={styles.input}
+              placeholder="Enter your password"
+              required
+            />
+
+            <button type="submit" style={styles.button} disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
+            </button>
+
+            {error && <div style={styles.error}>{error}</div>}
+
+            <p style={styles.signupText}>
+              Don’t have an account?{" "}
+              <Link to="/signup" style={styles.signupLink}>
+                Signup
+              </Link>
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }
 
 const styles = {
   container: {
-    width: "100%",
+    display: "flex",
     height: "100vh",
-    background: "linear-gradient(135deg, #dbeafe, #93c5fd)",
-    padding: "0", // no padding so form fills
+    width: "100%",
+    background: "linear-gradient(135deg, #f0f9ff, #e0f2fe)",
+    fontFamily: "'Poppins', sans-serif",
+  },
+  left: {
+    flex: 1.2,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "30px",
+  },
+  image: {
+    width: "100%",
+    maxWidth: "600px",
+    borderRadius: "16px",
+  },
+  right: {
+    flex: 1,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "white",
+    borderTopLeftRadius: "32px",
+    borderBottomLeftRadius: "32px",
+    boxShadow: "0 8px 30px rgba(0,0,0,0.1)",
+    padding: "40px",
   },
   form: {
-    background: "white",
-    padding: "40px",
-    width: "100%",    // ✅ full width
-    height: "100%",   // ✅ full height
+    width: "100%",
+    maxWidth: "380px",
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center",
-    gap: "16px",
+    gap: "18px",
   },
   title: {
-    marginBottom: "20px",
-    color: "#1d4ed8",
-    fontSize: "2rem",
+    fontSize: "30px",
+    fontWeight: "700",
+    color: "#0f172a",
+    textAlign: "center",
   },
-  label: { fontSize: "16px", fontWeight: "600", color: "#374151" },
+  subtitle: {
+    fontSize: "15px",
+    color: "#64748b",
+    marginBottom: "15px",
+    textAlign: "center",
+  },
+  label: {
+    fontSize: "14px",
+    fontWeight: "600",
+    color: "#1e293b",
+  },
   input: {
     padding: "14px",
-    borderRadius: "6px",
+    borderRadius: "10px",
     border: "1px solid #cbd5e1",
+    fontSize: "15px",
     outline: "none",
-    fontSize: "16px",
-    width: "100%",
   },
   button: {
     padding: "14px",
-    background: "#1d4ed8",
+    background: "linear-gradient(90deg, #06b6d4, #0ea5e9)",
     color: "white",
     fontWeight: "600",
     border: "none",
-    borderRadius: "6px",
+    borderRadius: "10px",
     cursor: "pointer",
-    width: "100%",
     fontSize: "16px",
+    transition: "transform 0.2s ease, background 0.3s ease",
   },
   error: {
-    marginTop: "12px",
+    marginTop: "6px",
     padding: "10px",
     background: "#fee2e2",
     color: "#b91c1c",
@@ -127,4 +169,17 @@ const styles = {
     fontSize: "14px",
     textAlign: "center",
   },
+  signupText: {
+    marginTop: "12px",
+    textAlign: "center",
+    fontSize: "14px",
+    color: "#475569",
+  },
+  signupLink: {
+    color: "#0ea5e9",
+    fontWeight: "600",
+    textDecoration: "none",
+    marginLeft: "5px",
+  },
 };
+

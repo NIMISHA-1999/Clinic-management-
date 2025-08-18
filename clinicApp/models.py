@@ -100,6 +100,7 @@ class Appointment(models.Model):
         if Leave.objects.filter(doctor=self.doctor, date=self.appointment_date, slot=self.slot).exists():
             raise ValidationError("Doctor is on leave for this slot.")
         # already booked handled by unique_together at DB level
+        
 
     def __str__(self):
         return f"{self.patient_name} - {self.doctor} - {self.appointment_date} {self.slot.label}"

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./AuthContext";
 import Login from "./pages/Login";
 import Doctors from "./pages/Doctors";
@@ -11,34 +11,59 @@ function Guard({ children }) {
   return token ? children : <Navigate to="/login" replace />;
 }
 
+function Layout({ children }) {
+  const location = useLocation();
+  const { token, logout } = useAuth(); 
+  const hideNavbar = ["/login", "/signup"].includes(location.pathname);
+
+  return (
+    <div style={styles.app}>
+      {!hideNavbar && (
+        <nav style={styles.nav}>
+          <Link to="/" style={styles.logo}>💙 HealthPortal</Link>
+
+          <div style={styles.links}>
+            <Link to="/" style={styles.link}>Doctors</Link>
+            <Link to="/appointments" style={styles.link}>Appointments</Link>
+
+            {token ? (
+              <button onClick={logout} style={styles.logoutBtn}>Logout</button>
+            ) : (
+              <>
+                <Link to="/login" style={styles.link}>Login</Link>
+                <Link to="/signup" style={styles.link}>Signup</Link>
+              </>
+            )}
+          </div>
+        </nav>
+      )}
+      <main style={styles.main}>{children}</main>
+    </div>
+  );
+}
+
+function AppRoutes() {
+  const { token } = useAuth();
+
+  return (
+    <Routes>
+      <Route path="/" element={token ? <Doctors /> : <Navigate to="/login" replace />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/book/:id" element={<Guard><Book /></Guard>} />
+      <Route path="/appointments" element={<Guard><Appointments /></Guard>} />
+      <Route path="*" element={<Navigate to={token ? "/" : "/login"} replace />} />
+    </Routes>
+  );
+}
+
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div style={styles.app}>
-          {/* Navbar */}
-          <nav style={styles.nav}>
-             <Link to="/" style={styles.logo}>💙 HealthPortal</Link>
-
-            <div style={styles.links}>
-    <Link to="/" style={styles.link}>Doctors</Link>
-    <Link to="/appointments" style={styles.link}>Appointments</Link>
-    <Link to="/login" style={styles.link}>Login</Link>
-    <Link to="/signup" style={styles.link}>Signup</Link>
-  </div>
-          </nav>
-
-          {/* Pages */}
-          <main style={styles.main}>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/" element={<Doctors />} />
-              <Route path="/book/:id" element={<Guard><Book /></Guard>} />
-              <Route path="/appointments" element={<Guard><Appointments /></Guard>} />
-            </Routes>
-          </main>
-        </div>
+        <Layout>
+          <AppRoutes />
+        </Layout>
       </BrowserRouter>
     </AuthProvider>
   );
@@ -58,7 +83,7 @@ const styles = {
     right: 0,
     zIndex: 1000,
     padding: "30px 32px",
-    background: "linear-gradient(90deg, #1e293b, #0f172a)", // dark gradient
+    background: "linear-gradient(90deg, #1e293b, #0f172a)",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
@@ -67,7 +92,7 @@ const styles = {
   logo: {
     fontSize: "22px",
     fontWeight: "700",
-    color: "#38bdf8", // cyan accent
+    color: "#38bdf8",
     textDecoration: "none",
     letterSpacing: "1px",
   },
@@ -77,23 +102,26 @@ const styles = {
   },
   link: {
     textDecoration: "none",
-    color: "#e2e8f0", // light gray
+    color: "#e2e8f0",
     fontWeight: "500",
     fontSize: "15px",
     padding: "6px 10px",
     borderRadius: "6px",
     transition: "all 0.3s ease",
   },
-  linkHover: {
-    background: "#334155",
-    color: "#38bdf8",
-  },
   main: {
     flex: 1,
     width: "100%",
-    padding: "24px",
-    background: "#f1f5f9", // light gray bg for content
     boxSizing: "border-box",
     marginTop: "70px",
+  },
+  logoutBtn: {
+    background: "transparent",
+    border: "1px solid #38bdf8",
+    color: "#38bdf8",
+    padding: "6px 12px",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "500",
   },
 };

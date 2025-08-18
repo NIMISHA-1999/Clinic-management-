@@ -1,5 +1,9 @@
 from rest_framework import generics, permissions, response
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import (
     SignupSerializer, LoginSerializer, UserSerializer,
     DoctorSerializer, DoctorListSerializer,
@@ -22,6 +26,19 @@ class MeView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
     def get_object(self): return self.request.user
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data.get("refresh")
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({"detail": "Successfully logged out"}, status=200)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
+
 
 # --- Doctors ---
 class DoctorListView(generics.ListCreateAPIView):

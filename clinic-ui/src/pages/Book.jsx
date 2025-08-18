@@ -32,18 +32,17 @@ export default function Book() {
   const submit = async (e) => {
     e.preventDefault();
     setErr(null);
-    try {
-      await api.post("/appointments", {
-        patient_name: form.patient_name,
-        age: Number(form.age),
-        appointment_date: form.appointment_date,
-        doctor_id: Number(id),
-        slot_id: Number(form.slot_id),
-      });
-      nav("/appointments");
-    } catch (er) {
-      setErr(er.response?.data || "Error");
-    }
+   try {
+  await api.post("/appointments", form);
+  alert("✅ Appointment booked successfully!");
+} catch (err) {
+  if (err.response?.data?.non_field_errors) {
+    alert("⚠️ This doctor is already booked for that date and slot. Please choose another.");
+  } else {
+    alert("❌ Something went wrong. Please try again.");
+  }
+}
+
   };
 
   return (
@@ -69,14 +68,24 @@ export default function Book() {
           value={form.age}
           onChange={(e) => setForm((f) => ({ ...f, age: e.target.value }))}
         />
-        <input
+        {/* <input
           style={styles.input}
           type="date"
           value={form.appointment_date}
           onChange={(e) =>
             setForm((f) => ({ ...f, appointment_date: e.target.value }))
           }
-        />
+        /> */}
+        <input
+  style={styles.input}
+  type="date"
+  min={new Date(Date.now() + 86400000).toISOString().split("T")[0]} // tomorrow
+  value={form.appointment_date}
+  onChange={(e) =>
+    setForm((f) => ({ ...f, appointment_date: e.target.value }))
+  }
+/>
+
         <select
           style={styles.input}
           value={form.slot_id}
@@ -90,7 +99,12 @@ export default function Book() {
           ))}
         </select>
         <button style={styles.button}>Book Appointment</button>
-        {err && <pre style={styles.error}>{JSON.stringify(err, null, 2)}</pre>}
+        {err && (
+  <p style={styles.error}>
+    {err?.[0] || "Something went wrong. Please try again."}
+  </p>
+)}
+
       </form>
     </div>
   </div>
@@ -99,7 +113,7 @@ export default function Book() {
 
 const styles = {
   container: {
-    minHeight: "100vh",
+    minHeight: "80vh",
     background: "#f9fafb",
     display: "flex",
     justifyContent: "center",
